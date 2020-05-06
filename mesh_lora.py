@@ -11,7 +11,6 @@ import time
 
 logger = logging.getLogger()
 
-
 class Messenger:
     """A node of a LoRa meshed network. Store received messages in inbox.json
 
@@ -74,7 +73,8 @@ class Messenger:
             return None
         id_from, id_to, id_message, flags = packet[:4]
         message = packet[4:]
-        logger.info('message {} (from {} to {}) received : {}'.format(id_message, id_from, id_to, message))
+        logger.info('message {} (from {} to {}) received : {}'.format(
+            id_message, id_from, id_to, message))
         return id_from, id_to, id_message, flags, message
 
     def _send_packet(self, packet):
@@ -85,10 +85,12 @@ class Messenger:
             self.rfm95.send(message, tx_header=(
                 id_from, id_to, id_message, flags))
         except RuntimeError as error:
-            logger.error('sending of packet {} failed : {}'.format(id_message, error))
+            logger.error(
+                'sending of packet {} failed : {}'.format(id_message, error))
         else:
-            logger.info('message {} (from {} to {}) sent : {}'.format(id_message, id_from, id_to, message))
-        
+            logger.info('message {} (from {} to {}) sent : {}'.format(
+                id_message, id_from, id_to, message))
+
     def is_packet_for_me(self, packet):
         if self.id_in_network == 255:  # I am just a node
             return False
@@ -99,7 +101,6 @@ class Messenger:
     def drop_in_inbox(self, received_packet):
         self.inbox.append(received_packet)
         logger.info('new message in my inbox')
-
 
 
 def custom_log_setup():
