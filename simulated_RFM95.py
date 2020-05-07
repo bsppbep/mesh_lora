@@ -1,10 +1,7 @@
-import os
-import logging
 import time
 import random
 
-
-logger = logging.getLogger()
+from setup_logger import logger
 
 class RFM95():
     """Fake communication devices of subclass of adafruit_rfm9x.RFM95
@@ -34,6 +31,7 @@ class RFM95():
         # else : a message !
         b_id_from = (random.randint(0,10)).to_bytes(1, 'big')
         b_id_to = (random.randint(0, 3)).to_bytes(1, 'big')
+        # b_id_to = (255).to_bytes(1, 'big')
         b_id_message = (random.randint(0, 254)).to_bytes(1, 'big')
         b_flags = (0).to_bytes(1, 'big')
         
@@ -59,23 +57,7 @@ class RFM95():
 
 
 if __name__=='__main__':
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-
-    log_file_name = "logs/fake_RFM_" + time.strftime("%Y-%m-%d") + ".log"
-
-    formatter = logging.Formatter(
-        fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
-
-    logger.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-    file_handler = logging.FileHandler(log_file_name, mode="w")
-
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-
     rfm95 = RFM95()
     my_message = b'hello world'
     rfm95.send(my_message)
     print(rfm95.receive(timeout=5,with_header=True))
-

@@ -8,21 +8,7 @@ import os
 import logging
 import time
 
-formatter = logging.Formatter(
-    fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
-
-if not os.path.exists('logs'):
-    os.makedirs('logs')
-
-log_file_name = "logs/messenger_" + time.strftime("%Y-%m-%d") + ".log"
-
-file_handler = logging.FileHandler(log_file_name, mode="w")
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-
-logger = logging.getLogger()
-logger.addHandler(file_handler)
-
+from setup_logger import logger
 
 class RFM95(adafruit_rfm9x.RFM9x):
     """Communication device, subclass of adafruit_rfm9x.RFM9x
