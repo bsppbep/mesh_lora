@@ -10,6 +10,10 @@ This project was initiated by the Bureau Études et Prospective of the Paris Fir
 
 ## Usage
 
+Clone the repo and run:
+```
+pip install -r requirement.txt
+```
 
 
 ## Operating principle
@@ -20,6 +24,7 @@ Here is a simplistic animation of the transmission of a packet, from the sender 
 
 
 Here is the flow chart of the thread that manages the reception and retransmission of packets. From the point of view of the tag, the idea is simple: if a packet is not for me, and I never received it, I retransmit it.
+
 ![](docs/flow_chart.png)
 
 ## Planned improvement
