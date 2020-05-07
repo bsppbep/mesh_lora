@@ -1,15 +1,16 @@
+# -*- coding: utf-8 -*-
+"""LoRa network messenger
 
-# coding:utf-8
-"""Mesh LoRa communication
+
 """
 
 import threading
-import logging
 import json
-import os
 import time
+import json
 
-logger = logging.getLogger()
+from setup_logger import logger
+
 
 class Messenger:
     """A node of a LoRa meshed network. Store received messages in inbox.json
@@ -18,17 +19,25 @@ class Messenger:
             rfm95 (RFM95): The radio through which the message is sent
     """
 
-    def __init__(self, rfm95, id_in_network=255):
+    def __init__(self, rfm95, inbox_filename='inbox.json', id_in_network=255):
         self.rfm95 = rfm95
         self.id_in_network = id_in_network
+        self.inbox_filename = inbox_filename
 
         # Thread initialisation
-        self._sender_receiver_thread = threading.Thread(name="LoRa messenger thread",
-                                                        target=self._sender_receiver, daemon=True)
+        self._sender_receiver_thread = threading.Thread(
+            name="LoRa messenger thread",
+            target=self._sender_receiver, daemon=True)
 
+        # Initialise the packets_to_send stack
         self.packets_to_send = []
-        self.received_packets = set()
-        self.inbox = []
+
+        # Every time a packet is received, his id is store in that set
+        self.received_packets_id = set()
+
+        # initialize the inbox file
+        with open(self.inbox_filename, 'w') as inbox_file:
+            json.dump([], inbox_file, indent=4)
 
     def start(self):
         self._sender_receiver_thread.start()
@@ -50,82 +59,101 @@ class Messenger:
                     continue
 
                 # if the package has already been received, continue
-                if received_packet in self.received_packets:
+                if self._packet_already_received(received_packet):
                     continue
 
                 # else, keep a trace of the packet
-                self.received_packets.add(received_packet)
+                self._remember_we_got_that_packet(received_packet)
 
                 # if the packet is for me, drop it in the inbox
-                if self.is_packet_for_me(received_packet):
+                if self._is_packet_for_me(received_packet):
                     self.drop_in_inbox(received_packet)
-                # if the packet is not for me, re-send
-                else:
+
+                # if the packet is not for me, or if it is
+                # for everyone, forward it.
+                if not(self._is_packet_for_me(received_packet)) \
+                        or self._is_packet_for_everyone(received_packet):
                     self.packets_to_send.append(received_packet)
 
     def _receive(self):
-        """Receive a packet and returns (id_from, id_to, id_message, flags, message)"""
+        """Receive a packet and returns (id_from, id_to, id_packet, flags, message)"""
         # packet is a binary message. It starts with
-        # the first 4 bytes are (id_from, id_to, id_message, flags)
+        # the first 4 bytes are (id_from, id_to, id_packet, flags)
         # the rest is the message
         packet = self.rfm95.receive(with_header=True)
         if packet is None:
             return None
-        id_from, id_to, id_message, flags = packet[:4]
+        id_from, id_to, id_packet, flags = packet[:4]
         message = packet[4:]
-        logger.info('message {} (from {} to {}) received : {}'.format(
-            id_message, id_from, id_to, message))
-        return id_from, id_to, id_message, flags, message
+        logger.info('message (id : {}) from {} to {} received : {}'.format(
+            id_packet, id_from, id_to, message))
+        return id_from, id_to, id_packet, flags, message
 
     def _send_packet(self, packet):
         """Send an packet through RFM95"""
-        id_from, id_to, id_message, flags, message = packet
+        id_from, id_to, id_packet, flags, message = packet
         try:
             # tx_header = (To,From,ID,Flags)
             self.rfm95.send(message, tx_header=(
-                id_from, id_to, id_message, flags))
+                id_from, id_to, id_packet, flags))
         except RuntimeError as error:
             logger.error(
-                'sending of packet {} failed : {}'.format(id_message, error))
+                'sending of packet {} failed : {}'.format(id_packet, error))
         else:
-            logger.info('message {} (from {} to {}) sent : {}'.format(
-                id_message, id_from, id_to, message))
+            logger.info('message (id : {}) from {} to {} sent : {}'.format(
+                id_packet, id_from, id_to, message))
 
-    def is_packet_for_me(self, packet):
+    def _is_packet_for_me(self, packet):
         if self.id_in_network == 255:  # I am just a node
             return False
 
         _, id_to, _, _, _ = packet
-        return self.id_in_network == id_to
+        return id_to in [self.id_in_network, 255]
 
-    def drop_in_inbox(self, received_packet):
-        self.inbox.append(received_packet)
+    def _is_packet_for_everyone(self, packet):
+        _, id_to, _, _, _ = packet
+        return id_to == 255
+
+    def _packet_already_received(self, packet):
+        id_from, id_to, id_packet, flags = packet[:4]
+        return id_packet in self.received_packets_id
+
+    def _remember_we_got_that_packet(self, packet):
+        id_from, id_to, id_packet, flags = packet[:4]
+        self.received_packets_id.add(id_packet)
+
+    def drop_in_inbox(self, packet):
+        # get the inbox by loading the json file
+        with open(self.inbox_filename) as inbox_file:
+            inbox = json.load(inbox_file)
+
+        # add the new packet in the inbox
+        id_from, id_to, id_packet, flags, message = packet
+        inbox.append({
+            'id_from': id_from,
+            'id_to': id_to,
+            'id_packet': id_packet,
+            'flags': flags,
+            'message': message.decode()})
         logger.info('new message in my inbox')
 
-
-def custom_log_setup():
-    formatter = logging.Formatter(
-        fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-    log_file_name = "logs/mesh_lora_" + time.strftime("%Y-%m-%d") + ".log"
-    file_handler = logging.FileHandler(log_file_name, mode="w")
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
-
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(file_handler)
-    return logger
+        # write on the json file the updated inbox.
+        with open(self.inbox_filename, 'w') as inbox_file:
+            json.dump(inbox, inbox_file, indent=4)
 
 
 if __name__ == '__main__':
+    # defines a simulated RFM95
     from simulated_RFM95 import RFM95
-
-    logger = custom_log_setup()
-
     rfm95 = RFM95()
-    logger.info('start')
-    my_messenger = Messenger(rfm95, 1)
+
+    logger.info('start simulation')
+
+    # Init the messenger. It's id withing the network is 1
+    my_messenger = Messenger(rfm95, id_in_network=1)
+
+    # Make it work 20 secondes
     my_messenger.start()
-    time.sleep(10)
+    time.sleep(20)
+
     logger.info('end')
