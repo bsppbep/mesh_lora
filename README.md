@@ -81,7 +81,7 @@ All new messages sent to you end up in ```inbox.json```. They match the followin
 
 ## Planned improvement
  - Time to Live
-
+ - Flush ```packet already received``` regularly
 
 ## License
 
