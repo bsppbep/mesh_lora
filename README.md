@@ -69,17 +69,13 @@ python3 main.py
 
 All new messages sent to you end up in ```inbox.json```. They match the following pattern:
 ```json
-[
-    ...,
-    {
-        "id_from": 5,
-        "id_to": 1,
-        "id_packet": 189,
-        "flags": 0,
-        "message": "message content"
-    },
-    ...
-]
+{
+    "id_from": 5,
+    "id_to": 1,
+    "id_packet": 189,
+    "flags": 0,
+    "message": "message content"
+}
 ```
 
 
