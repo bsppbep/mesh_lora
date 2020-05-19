@@ -24,6 +24,7 @@ else:
 # defines RFM95
 rfm95 = RFM95()
 
+# start logger
 logger.info('start')
 
 # Initialize the messenger.
