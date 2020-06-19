@@ -5,8 +5,9 @@
 This project was initiated by the Bureau Études et Prospective of the Paris Fire Brigade. Its aim is to provide a resilient communication channel for the transmission of light data, such as the physiological state of the firefighters involved.
 
 This repository presents a simple proof of concept for the mesh LoRa. To strictly reproduce this work, you must have :
+
 - a [Raspberry Pi nano](https://www.raspberrypi.org/products/raspberry-pi-zero-w/)
--  an [adafruit](https://www.adafruit.com) RFM95 module (no longer sold)
+- an [adafruit](https://www.adafruit.com) RFM95 module (no longer sold)
 
 If you do not have this hardware, you can also use this repository in simulation mode (see the usage section).
 
@@ -15,20 +16,20 @@ _Nota_ : This work has not been tested with the [newer versions of LoRa transmit
 ## Operating principle
 
 Here is a simplistic animation of the transmission of a packet, from the sender to the recipient.
-![](docs/anim.gif)
 
-
+![gif animation](docs/anim.gif)
 
 Here is the flow chart of the thread that manages the reception and retransmission of packets. From the point of view of the tag, the idea is simple: if a packet is not for me, and I never received it, I retransmit it.
 
-![](docs/flow_chart.png)
+![flow chart](docs/flow_chart.png)
 
 ## Installation (skip this section if you just want to use simulation)
 
 If you read this section, I assume you have the proper hardware (Raspberry Pi + RFM95).
 
-Connect the RFM95 module like this: 
-![](docs/RFM9x.png)
+Connect the RFM95 module like this:
+
+![RFM9x circuit](docs/RFM9x.png)
 
 | Raspberry Pi                | Adafruit GPS |
 |-----------------------------|--------------|
@@ -43,45 +44,50 @@ Connect the RFM95 module like this:
 | Pin n°22 (```GPIO25```)     | ```RST```    |
 
 Clone the repo and run:
-```
+
+```shell
 pip3 install -r requirement.txt
 ```
 
-
 ## Usage
 
-First, in ```main.py```, make sure you're in the mode you want: 
+First, in ```main.py```, make sure you're in the mode you want:
+
 - Choose whether you want to use the simulation or not.
+
 ```python
 simulation = True
 ```
 
 - Choose the id of you beacon:
+
 ```python
 my_messenger = Messenger(rfm95, id_in_network=255)
 ```
 
 Then, run
 
-```
+```shell
 python3 main.py
 ```
 
 All new messages sent to you end up in ```inbox.json```. They match the following pattern:
+
 ```json
 {
     "id_from": 5,
     "id_to": 1,
     "id_packet": 189,
     "flags": 0,
-    "message": "message content"
+    "message": "message content",
+    "receipt_time": 1592557983.633974
 }
 ```
 
-
 ## Planned improvement
- - Time To Live
- - Flush ```packet already received``` regularly
+
+- Time To Live
+- Flush ```packet already received``` regularly
 
 ## License
 

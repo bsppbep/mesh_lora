@@ -196,7 +196,8 @@ class Messenger:
             'id_to': id_to,
             'id_packet': id_packet,
             'flags': flags,
-            'message': message.decode()})
+            'message': message.decode(),
+            'receipt_time': time.time()})
         logger.info('new message (id : {}) in my inbox'.format(id_packet))
 
         # write on the json file the updated inbox.
