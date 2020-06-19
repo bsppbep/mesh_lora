@@ -55,8 +55,13 @@ class Messenger:
         # Initialise the packets_to_send stack
         self.packets_to_send = []
 
-        # Every time a packet is received, his id is store in that set
-        self.received_packets_id = set()
+        # Each time a packet is received, its header (id_from, id_to,
+        # id_packet, flags) and time of receipt are stored in this set.
+        self._received_packets_header_and_time = []
+
+        # Two packets are considered identical, only if they have the
+        # same (id_from, id_to, id_packet) and their reception is less than x seconds apart:
+        self._packet_max_age = 3  # secondes
 
         # initialize the inbox file
         with open(self.inbox_filename, 'w') as inbox_file:
@@ -159,13 +164,22 @@ class Messenger:
 
     def _packet_already_received(self, packet):
         """Whether the packet has been already received"""
-        id_from, id_to, id_packet, flags = packet[:4]
-        return id_packet in self.received_packets_id
+        # get the header of the packet and the time of receipt
+        id_from, id_to, id_packet, _ = packet[:4]
+
+        # compare to all packets already received
+        for old_id_from, old_id_to, old_id_packet, old_receipt_time in self._received_packets_header_and_time:
+            if time.time() - old_receipt_time > self._packet_max_age:
+                continue  # old packet is too old, and is ignored
+            if (old_id_from, old_id_to, old_id_packet) == (id_from, id_to, id_packet):
+                return True
+        return False
 
     def _remember_we_got_that_packet(self, packet):
         """Add the packet id to the list of packet ids already received"""
-        id_from, id_to, id_packet, flags = packet[:4]
-        self.received_packets_id.add(id_packet)
+        id_from, id_to, id_packet, _ = packet[:4]
+        self._received_packets_header_and_time.append(
+            (id_from, id_to, id_packet, time.time()))
         logger.info(
             'message (id : {}) stored in the list of packages already received.'.format(id_packet))
 
