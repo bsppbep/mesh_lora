@@ -31,7 +31,8 @@ logger.info('start')
 # The id (between 1 and 254) must be unique in the network.
 # If you want the tag to act only as a relay, you can use id 255.
 # The id 255 does not need to be unique in the network.
-my_messenger = Messenger(rfm95, id_in_network=255)
+my_messenger = Messenger(rfm95, id_in_network=1)
+logger.info('Messenger id : {}'.format(my_messenger.id_in_network))
 
 # Make it work 60 secondes
 my_messenger.start()
