@@ -3,7 +3,6 @@ adafruit-circuitpython-busdevice==4.3.1
 adafruit-circuitpython-rfm9x==2.0.0
 Adafruit-PlatformDetect==2.11.1
 Adafruit-PureIO==1.1.5
-pkg-resources==0.0.0
 pyftdi==0.51.2
 pyserial==3.4
 pyusb==1.0.2

@@ -140,8 +140,10 @@ class Messenger:
         id_from, id_to, id_packet, flags, message = packet
         try:
             # tx_header = (To,From,ID,Flags)
-            self.rfm95.send(message, tx_header=(
-                id_from, id_to, id_packet, flags))
+            self.rfm95.send(message, destination=id_to, node=id_from,
+                identifier=id_packet, flags=flags)
+            # self.rfm95.send(message, tx_header=(
+            #     id_from, id_to, id_packet, flags))
         except Exception as error:
             logger.error(
                 'sending of packet {} failed : {}'.format(id_packet, error))
