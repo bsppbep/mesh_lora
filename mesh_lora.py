@@ -50,7 +50,7 @@ class Messenger:
         # Thread initialisation
         self._sender_receiver_thread = threading.Thread(
             name="LoRa messenger thread",
-            target=self._sender_receiver, daemon=True)
+            target=self._sender_receiver, daemon=False)
 
         # Initialise the packets_to_send stack
         self.packets_to_send = []
