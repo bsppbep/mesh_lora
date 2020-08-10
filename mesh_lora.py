@@ -55,7 +55,7 @@ class Messenger:
         # Initialise the packets_to_send stack
         self.packets_to_send = []
 
-        # Each time a packet is received, its header (id_from, id_to,
+        # Each time a packet is received, its header (id_to, id_from,
         # id_packet, flags) and time of receipt are stored in this set.
         self._received_packets_header_and_time = []
 
@@ -103,7 +103,7 @@ class Messenger:
 
                 # if the package has already been received, continue
                 if self._packet_already_received(received_packet):
-                    id_from, id_to, id_packet, flags = received_packet[:4]
+                    id_to, id_from, id_packet, flags = received_packet[:4]
                     logger.debug(
                         'message (id : {}) already received : ignoring'.format(id_packet))
                     continue
@@ -129,7 +129,7 @@ class Messenger:
         packet = self.rfm95.receive(with_header=True)
         if packet is None:
             return None
-        id_from, id_to, id_packet, flags = packet[:4]
+        id_to, id_from, id_packet, flags = packet[:4]
         message = packet[4:]
         logger.info('message (id : {}) from {} to {} received : {}'.format(
             id_packet, id_from, id_to, message))
@@ -143,7 +143,7 @@ class Messenger:
             self.rfm95.send(message, destination=id_to, node=id_from,
                 identifier=id_packet, flags=flags)
             # self.rfm95.send(message, tx_header=(
-            #     id_from, id_to, id_packet, flags))
+            #     id_to, id_from, id_packet, flags))
         except Exception as error:
             logger.error(
                 'sending of packet {} failed : {}'.format(id_packet, error))
@@ -167,7 +167,7 @@ class Messenger:
     def _packet_already_received(self, packet):
         """Whether the packet has been already received"""
         # get the header of the packet and the time of receipt
-        id_from, id_to, id_packet, _ = packet[:4]
+        id_to, id_from, id_packet, _ = packet[:4]
 
         # compare to all packets already received
         for old_id_from, old_id_to, old_id_packet, old_receipt_time in self._received_packets_header_and_time:
@@ -179,7 +179,7 @@ class Messenger:
 
     def _remember_we_got_that_packet(self, packet):
         """Add the packet id to the list of packet ids already received"""
-        id_from, id_to, id_packet, _ = packet[:4]
+        id_to, id_from, id_packet, _ = packet[:4]
         self._received_packets_header_and_time.append(
             (id_from, id_to, id_packet, time.time()))
         logger.info(
