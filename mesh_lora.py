@@ -26,6 +26,8 @@ import time
 import json
 import random
 
+from blinkt import set_pixel, show, clear
+
 from setup_logger import logger
 
 
@@ -93,6 +95,12 @@ class Messenger:
                 packet_to_send = self.packets_to_send.pop()
                 self._send_packet(packet_to_send)
 
+                set_pixel(3, 127, 0, 255)
+                show()
+                time.sleep(0.3)
+                set_pixel(3, 0, 0, 0)
+                show()
+
             # if there is no packet to send
             else:
                 received_packet = self._receive()
@@ -108,12 +116,27 @@ class Messenger:
                         'message (id : {}) already received : ignoring'.format(id_packet))
                     continue
 
+                # new packet received
+                set_pixel(4, 0, 204, 0)
+                show()
+                time.sleep(0.3)
+                set_pixel(4, 0, 0, 0)
+                show()
+
+
                 # else, keep a trace of the packet
                 self._remember_we_got_that_packet(received_packet)
 
                 # if the packet is for me, drop it in the inbox
                 if self._is_packet_for_me(received_packet):
                     self.drop_in_inbox(received_packet)
+
+                    # new packet received
+                    set_pixel(5, 0, 204, 0)
+                    show()
+                    time.sleep(0.3)
+                    set_pixel(5, 0, 0, 0)
+                    show()
 
                 # if the packet is not for me, or if it is
                 # for everyone, forward it.

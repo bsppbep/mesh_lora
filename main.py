@@ -40,12 +40,13 @@ for i in range(8):
     set_pixel(i, 255, 255, 255)
     show()
     time.sleep(0.1)
+clear()
 
-if messenger.id_in_network == 255:
+if my_messenger.id_in_network == 255:
     set_pixel(0, 250, 250, 0) # yellow
-elif messenger.id_in_network == 1:
+elif my_messenger.id_in_network == 1:
     set_pixel(0, 255, 0, 127) # pink
-elif messenger.id_in_network == 2:
+elif my_messenger.id_in_network == 2:
     set_pixel(0, 0, 0, 255) # blue
 show()
 
@@ -54,9 +55,15 @@ my_messenger.start()
 
 while True:
     try:
-        time.sleep(1)
+        if my_messenger.id_in_network == 1:
+            my_messenger.post('hello 2')
+        if my_messenger.id_in_network == 2:
+            my_messenger.post('hi 1')
+        time.sleep(4)
+
     except:
         clear()
         show()
+        break
 
 
