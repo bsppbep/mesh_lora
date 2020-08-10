@@ -11,6 +11,7 @@ import time
 
 from mesh_lora import Messenger
 from setup_logger import logger
+from blinkt import set_pixel, show, clear
 
 # If you run this code on a module that does not have an
 # RFM95 module, you can use a simulation of the RFM95 module.
@@ -34,5 +35,28 @@ logger.info('start')
 my_messenger = Messenger(rfm95, id_in_network=255)
 logger.info('Messenger id : {}'.format(my_messenger.id_in_network))
 
-# Make it work 60 secondes
+for i in range(8):
+    clear()
+    set_pixel(i, 255, 255, 255)
+    show()
+    time.sleep(0.1)
+
+if messenger.id_in_network == 255:
+    set_pixel(0, 250, 250, 0) # yellow
+elif messenger.id_in_network == 1:
+    set_pixel(0, 255, 0, 127) # pink
+elif messenger.id_in_network == 2:
+    set_pixel(0, 0, 0, 255) # blue
+show()
+
+# Start
 my_messenger.start()
+
+while True:
+    try:
+        time.sleep(1)
+    except:
+        clear()
+        show()
+
+
