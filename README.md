@@ -4,14 +4,14 @@
 
 This project was initiated by the Bureau Études et Prospective of the Paris Fire Brigade. Its aim is to provide a resilient communication channel for the transmission of light data, such as the physiological state of the firefighters involved.
 
-This repository presents a simple proof of concept for the mesh LoRa. To strictly reproduce this work, you must have :
+This repository presents a simple proof of concept for the mesh LoRa. To strictly reproduce this work, you need :
 
 - a [Raspberry Pi nano](https://www.raspberrypi.org/products/raspberry-pi-zero-w/)
 - an [adafruit](https://www.adafruit.com) RFM95 module (no longer sold)
 
 If you do not have this hardware, you can also use this repository in simulation mode (see the usage section).
 
-_Nota_ : This work has not been tested with the [newer versions of LoRa transmitters](https://www.adafruit.com/product/3073), but I'm very confident that it would work very well too. If you do, please let me know.
+_Nota_ : This work has not been tested with the [newest version of LoRa transmitters](https://www.adafruit.com/product/3073), but I'm very confident that it would work very well too. If you do, please let me know.
 
 ## Operating principle
 
@@ -46,7 +46,7 @@ Connect the RFM95 module like this:
 Clone the repo and run:
 
 ```shell
-pip3 install -r requirement.txt
+pip install -r requirement.txt
 ```
 
 ## Usage
