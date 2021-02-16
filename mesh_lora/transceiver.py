@@ -1,16 +1,21 @@
 
-import board
-import busio
-import adafruit_rfm9x
-from digitalio import DigitalInOut
+import warnings
+
+try:
+    import board
+    import busio
+    import adafruit_rfm9x
+    from digitalio import DigitalInOut
+except NotImplementedError:
+    warnings.warn("board library can't be imported, ignore this warning if you are running a simulation")
 
 import os
 import logging
 import time
 
-from setup_logger import logger
+from mesh_lora.setup_logger import logger
 
-class RFM95(adafruit_rfm9x.RFM9x):
+class Transceiver(adafruit_rfm9x.RFM9x):
     """Communication device, subclass of adafruit_rfm9x.RFM9x
 
     Raspberry Pi    Adafruit GPS
