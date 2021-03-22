@@ -1,24 +1,24 @@
 import time
-import random
 import copy
-import threading
-
-from mesh_lora.setup_logger import logger
 
 
-class World(object):
+class World:
+    """A place where transciever meet and share packets
+    """
     def __init__(self):
-        self.RFM95s = []
+        self.transceivers = []
 
-    def add_RFM95(self, rfm95):
-        self.RFM95s.append(rfm95)
+    def spawn_transceiver(self, transceiver):
+        transceiver.world = self
+        self.transceivers.append(transceiver)
 
     def on_emmision(self, packet):
-        for rfm95 in self.RFM95s:
-            rfm95._on_reception(packet)
+        """Called by transciever when a packet is sent."""
+        for transceiver in self.transceivers:
+            transceiver._on_reception(packet)
 
 
-class FakeTransceiver(object):
+class FakeTransceiver:
     """Fake communication devices of subclass of adafruit_rfm9x.RFM95
     https://circuitpython.readthedocs.io/projects/rfm9x/en/latest/api.html
 
@@ -35,11 +35,10 @@ class FakeTransceiver(object):
 
     """
 
-    def __init__(self, world):
+    def __init__(self):
         self._listening = False
         self._last_packet = None
-        self.world = world
-        self.world.add_RFM95(self)
+        self.world = None
 
     def _on_reception(self, packet):
         """Function called by world when a packet is sent"""
@@ -57,7 +56,7 @@ class FakeTransceiver(object):
             if self._last_packet is not None:
                 break
             time.sleep(0.001)
-    
+
         packet = copy.deepcopy(self._last_packet)
         self._last_packet = None
         self._listening = keep_listening
@@ -76,19 +75,22 @@ class FakeTransceiver(object):
             + identifier.to_bytes(1, 'big')
             + flags.to_bytes(1, 'big')
             + data)
-        
+
         self._listening = False
         self.world.on_emmision(packet)
         self._listening = keep_listening
 
 
-
 if __name__ == '__main__':
+    import threading
     world = World()
-    transceiver_1 = FakeTransceiver(world)
-    transceiver_2 = FakeTransceiver(world)
+    transceiver_1 = FakeTransceiver()
+    transceiver_2 = FakeTransceiver()
+    world.spawn_transceiver(transceiver_1)
+    world.spawn_transceiver(transceiver_2)
 
     my_message = b'hello world'
+
     def wait_and_send():
         time.sleep(1)
         transceiver_1.send(my_message)

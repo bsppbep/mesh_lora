@@ -1,13 +1,8 @@
 
-import warnings
-
-try:
-    import board
-    import busio
-    import adafruit_rfm9x
-    from digitalio import DigitalInOut
-except NotImplementedError:
-    warnings.warn("board library can't be imported, ignore this warning if you are running a simulation")
+import board
+import busio
+import adafruit_rfm9x
+from digitalio import DigitalInOut
 
 import os
 import logging

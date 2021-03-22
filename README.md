@@ -1,5 +1,18 @@
 # Mesh LoRa
 
+## Quick start
+
+### Installation
+
+```bash
+git clone https://github.com/bsppbep/mesh_lora
+pip install -e mesh_lora
+```
+
+### Usage
+
+See examples.
+
 ## Introduction
 
 This project was initiated by the Bureau Études et Prospective of the Paris Fire Brigade. Its aim is to provide a resilient communication channel for the transmission of light data, such as the physiological state of the firefighters involved.
@@ -23,7 +36,7 @@ Here is the flow chart of the thread that manages the reception and retransmissi
 
 ![flow chart](docs/flow_chart.png)
 
-## Installation (skip this section if you just want to use simulation)
+## Hardware installation (skip this section if you just want to use simulation)
 
 If you read this section, I assume you have the proper hardware (Raspberry Pi + RFM95).
 
@@ -43,46 +56,6 @@ Connect the RFM95 module like this:
 | Pin n°26 (```SPI0_CE1_N```) | ```CS```     |
 | Pin n°22 (```GPIO25```)     | ```RST```    |
 
-Clone the repo and run:
-
-```shell
-pip install -r requirement.txt
-```
-
-## Usage
-
-First, in ```main.py```, make sure you're in the mode you want:
-
-- Choose whether you want to use the simulation or not.
-
-```python
-simulation = True
-```
-
-- Choose the id of you beacon:
-
-```python
-my_messenger = Messenger(rfm95, id_in_network=255)
-```
-
-Then, run
-
-```shell
-python3 main.py
-```
-
-All new messages sent to you end up in ```inbox.json```. They match the following pattern:
-
-```json
-{
-    "id_from": 5,
-    "id_to": 1,
-    "id_packet": 189,
-    "flags": 0,
-    "message": "message content",
-    "receipt_time": 1592557983.633974
-}
-```
 
 ## Planned improvement
 

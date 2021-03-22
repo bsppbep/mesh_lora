@@ -1,2 +1,6 @@
+import warnings
 from .interface import Interface
-from .transceiver import Transceiver
+try:
+    from .transceiver import Transceiver
+except NotImplementedError:
+    warnings.warn("board library can't be imported, ignore this warning if you are running a simulation")
