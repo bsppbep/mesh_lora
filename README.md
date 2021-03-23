@@ -56,7 +56,6 @@ Connect the RFM95 module like this:
 | Pin n°26 (```SPI0_CE1_N```) | ```CS```     |
 | Pin n°22 (```GPIO25```)     | ```RST```    |
 
-
 ## Planned improvement
 
 - Time To Live

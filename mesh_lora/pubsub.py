@@ -54,7 +54,7 @@ class Subscriber(Topic):
             if flags != PUBSUB_FLAG:  # check if it is "pubsub" complient
                 return  # if not, do nothing
             topic_name, message = pickle.loads(payload)
-            if topic_name != self.topic_name:  # check the topic name
+            if topic_name != self.topic_name and self.topic_name != 'all':  # check the topic name
                 return  # if not topic name does not match, do nothing
             func(message)  # else, call the function
         return inner

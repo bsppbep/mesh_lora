@@ -1,5 +1,7 @@
 import time
 import copy
+import random
+import numpy as np
 
 
 class World:
@@ -7,16 +9,23 @@ class World:
     """
     def __init__(self):
         self.transceivers = []
+        self.p = np.ones((10,10))
 
     def spawn_transceiver(self, transceiver):
         transceiver.world = self
         self.transceivers.append(transceiver)
 
-    def on_emmision(self, packet):
+    def on_emmision(self, transceiver_from, packet):
         """Called by transciever when a packet is sent."""
-        for transceiver in self.transceivers:
-            transceiver._on_reception(packet)
+        j = self.transceivers.index(transceiver_from)
+        for i, transceiver in enumerate(self.transceivers):
+            if i==j:
+                continue
+            if random.random() < self.p[i][j]:
+                transceiver._on_reception(packet)
 
+    def def_p(self, p):
+        self.p = p
 
 class FakeTransceiver:
     """Fake communication devices of subclass of adafruit_rfm9x.RFM95
@@ -77,7 +86,7 @@ class FakeTransceiver:
             + data)
 
         self._listening = False
-        self.world.on_emmision(packet)
+        self.world.on_emmision(self, packet)
         self._listening = keep_listening
 
 

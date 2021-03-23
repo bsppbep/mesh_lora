@@ -10,7 +10,6 @@ can only relay messages.
 import time
 
 from mesh_lora import Interface, Transceiver
-from mesh_lora.setup_logger import logger
 
 def spin():
     while True:
@@ -20,21 +19,8 @@ def spin():
             break
 
 def run():
-    # defines transceiver
-    transceiver = Transceiver()
-
-    # start logger
-    logger.info('start')
-
-    # Initialize the messenger.
-    # The id (between 1 and 254) must be unique in the network.
-    # If you want the tag to act only as a relay, you can use id 255.
-    # The id 255 does not need to be unique in the network.
-    my_interface = Interface(transceiver, node=255)
-    logger.info('Messenger id : {}'.format(my_interface.node))
-
-    # Start
-    my_interface.start()
+    interface = Interface(Transceiver(), node=255)
+    interface.start()
     spin()
 
 if __name__=='__main__':

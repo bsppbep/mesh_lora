@@ -141,7 +141,8 @@ class Interface:
             # if there is something to send, send it.
             if self._sending_queue:
                 packet_to_send = self._sending_queue.pop()
-                self._remember_the_packet(packet_to_send) # in order to ignore this packet if it go back
+                # in order to ignore this packet if it go back
+                self._remember_the_packet(packet_to_send)
                 self._send_packet(packet_to_send)
 
             # if there is no packet to send
@@ -178,7 +179,6 @@ class Interface:
         _, _, _, flags, payload = packet
         for callback in self._reception_callbacks:
             callback(payload, flags)
-
 
     def _receive(self) -> Packet:
         """Wait for a packet to be received, and return it."""
