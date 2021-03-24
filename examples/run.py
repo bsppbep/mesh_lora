@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Mesh LoRa. 
 
 A meshed LoRa network of communication beacons is being built here.
@@ -10,18 +10,12 @@ can only relay messages.
 import time
 
 from mesh_lora import Interface, Transceiver
+from mesh_lora.utils import spin
+from mesh_lora.nodes import ImmobilityDetector, Printer
 
-def spin():
-    while True:
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            break
 
-def run():
-    interface = Interface(Transceiver(), node=255)
-    interface.start()
-    spin()
-
-if __name__=='__main__':
-    run()
+interface = Interface(Transceiver(), node=255)
+interface.start()
+ImmobilityDetector(interface)
+Printer(interface, 'all')
+spin()
